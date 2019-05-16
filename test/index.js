@@ -1,20 +1,20 @@
 import { assert } from 'chai';
 import { App, genDeeplink } from '../src';
 
-const app = new App(process.env.APP_ID, process.env.APP_MAC_KEY, process.env.APP_CB_KEY, 'sandbox');
-
 describe('createOrder', () => {
   it('should return orderurl and zptranstoken', async () => {
-    const data = await app.createOrder(
-      '190513_64101f51', 'ZPI', 1000, Date.now(),
-      '{"deal_id": 2310,"user_id": 237949,"ref_code": "ZPI"}',
-      '[{"voucher_id": 284130,"voucher_price": 1000}]',
-      'Unit test'
-    );
+    const app = new App(process.env.APP_ID, process.env.APP_MAC_KEY, process.env.APP_CB_KEY, 'sandbox');
+    const data = await app.createOrder('190513_64101f51', 'ZPI', 1000, Date.now(), '', '', '');
     assert.equal(data.returncode, 1);
     assert.isEmpty(data.returnmessage);
     assert.isNotEmpty(data.orderurl);
     assert.isNotEmpty(data.zptranstoken);
+  });
+
+  it('should return error in wrong env', async () => {
+    const app = new App(process.env.APP_ID, process.env.APP_MAC_KEY, process.env.APP_CB_KEY);
+    const data = await app.createOrder('190513_64101f51', 'ZPI', 1000, Date.now(), '', '', '');
+    assert.notEqual(data.returncode, 1);
   });
 });
 
