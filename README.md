@@ -9,17 +9,20 @@
 ```bash
 $ npm i zpi-nodejs
 ```
-2. Create order
+
+2. Create order ([Detail](https://developers.zalopay.vn/docs/merchant/index.html#d-n-hang-co-kich-th-c-nh))
 
 ```node
-
+const { App } = require('zpi-nodejs');
+const app = new App(appid, macKey, callbackKey);
+const data = await app.createOrder(apptransid, appuser, amount, apptime, embeddata, item, description);
 ```
 
-2. Generate deeplink
+3. Generate deeplink
 
 ```node
 const { genDeeplink } = require('zpi-nodejs');
-genDeeplink(orderUrl);
+genDeeplink(data.orderUrl);
 ```
 
 3. Open deeplink from client

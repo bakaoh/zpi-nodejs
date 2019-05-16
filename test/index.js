@@ -1,5 +1,22 @@
 import { assert } from 'chai';
-import { genDeeplink } from '../src';
+import { App, genDeeplink } from '../src';
+
+const app = new App(process.env.APP_ID, process.env.APP_MAC_KEY, process.env.APP_CB_KEY, 'sandbox');
+
+describe('createOrder', () => {
+  it('should return orderurl and zptranstoken', async () => {
+    const data = await app.createOrder(
+      '190513_64101f51', 'ZPI', 1000, Date.now(),
+      '{"deal_id": 2310,"user_id": 237949,"ref_code": "ZPI"}',
+      '[{"voucher_id": 284130,"voucher_price": 1000}]',
+      'Unit test'
+    );
+    assert.equal(data.returncode, 1);
+    assert.isEmpty(data.returnmessage);
+    assert.isNotEmpty(data.orderurl);
+    assert.isNotEmpty(data.zptranstoken);
+  });
+});
 
 describe('genDeeplink', () => {
   it('should generate valid sandbox deeplink', () => {
