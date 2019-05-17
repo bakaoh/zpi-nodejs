@@ -18,6 +18,14 @@ describe('createOrder', () => {
   });
 });
 
+describe('getStatus', () => {
+  it('should return not empty', async () => {
+    const app = new App(process.env.APP_ID, process.env.APP_MAC_KEY, process.env.APP_CB_KEY, 'sandbox');
+    const data = await app.getStatus('190513_64101f51');
+    assert.isNotEmpty(data);
+  });
+});
+
 describe('genDeeplink', () => {
   it('should generate valid sandbox deeplink', () => {
     const orderUrl = 'https://sbgateway.zalopay.vn/openinapp?order=eyJ6cHRyYW5zdG9rZW4iOiJlSVV5ZTFuLUpqRUlWb1JJcC1XdEdRIiwiYXBwaWQiOjU4N30';

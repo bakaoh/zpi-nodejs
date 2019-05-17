@@ -8,6 +8,7 @@ function App(appid, macKey, callbackKey, env = 'production') {
   this.macKey = macKey;
   this.callbackKey = callbackKey;
   this.env = env;
+  this.baseUrl = this.env === 'production' ? 'zalopay.com.vn' : 'sandbox.zalopay.com.vn';
 }
 
 function createOrder(apptransid, appuser, amount, apptime, embeddata, item, description) {
@@ -18,7 +19,7 @@ function createOrder(apptransid, appuser, amount, apptime, embeddata, item, desc
   });
 
   const options = {
-    host: this.env === 'production' ? 'zalopay.com.vn' : 'sandbox.zalopay.com.vn',
+    host: this.baseUrl,
     port: 443,
     method: 'POST',
     path: '/v001/tpe/createorder',
@@ -42,7 +43,26 @@ function createOrder(apptransid, appuser, amount, apptime, embeddata, item, desc
   }));
 }
 
+function getStatus(apptransid) {
+  const hmacinput = `${this.appid}|${apptransid}|${this.macKey}`;
+  const mac = crypto.createHmac('SHA256', this.macKey).update(hmacinput).digest('hex');
+  const getData = querystring.stringify({
+    appid: this.appid, apptransid, mac
+  });
+
+  const reqUrl = `https://${this.baseUrl}/v001/tpe/getstatusbyapptransid?${getData}`;
+  return new Promise(((resolve, reject) => {
+    https.get(reqUrl, (res) => {
+      let result = '';
+      res.on('data', (chunk) => { result += chunk; });
+      res.on('end', () => { resolve(JSON.parse(result)); });
+      res.on('error', (err) => { reject(err); });
+    }).on('error', (err) => { reject(err); });
+  }));
+}
+
 App.prototype.createOrder = createOrder;
+App.prototype.getStatus = getStatus;
 
 const genDeeplink = (orderUrl) => {
   const order = new URL(orderUrl).searchParams.get('order');
